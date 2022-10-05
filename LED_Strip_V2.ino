@@ -1,21 +1,3 @@
-/*
- * Example05_WS2812_Neopixel.ino
- *
- *  Created on: 2020-10-01
- *      Author: Juergen Fink
- *	Thanks to all the other helpful people commenting here.
- *
- * This example allows to change brightness and color of a connected neopixel strip/matrix
- *
- * You should:
- * 1. read and use the Example01_TemperatureSensor with detailed comments
- *    to know the basic concept and usage of this library before other examples。
- * 2. erase the full flash or call homekit_storage_reset() in setup()
- *    to remove the previous HomeKit pairing storage and
- *    enable the pairing with the new accessory of this new HomeKit example.
- */
-
-
 #include <Arduino.h>
 #include <arduino_homekit_server.h>
 #include <Adafruit_NeoPixel.h>
@@ -38,7 +20,7 @@ int rgb_colors[3];
 
 void setup() {
 	Serial.begin(115200);
-	wifi_connect(); // in wifi_info.h
+	wifi_connect();
   homekit_storage_reset();
   pixels.begin(); 
   for(int i = 0; i < NUMPIXELS; i++)
@@ -57,12 +39,6 @@ void loop() {
 	my_homekit_loop();
 	delay(10);
 }
-
-//==============================
-// HomeKit setup and loop
-//==============================
-
-// access your HomeKit characteristics defined in my_accessory.c
 
 extern "C" homekit_server_config_t accessory_config;
 extern "C" homekit_characteristic_t cha_on;
@@ -87,7 +63,6 @@ void my_homekit_loop() {
 	arduino_homekit_loop();
 	const uint32_t t = millis();
 	if (t > next_heap_millis) {
-		// show heap info every 5 seconds
 		next_heap_millis = t + 5 * 1000;
 		LOG_D("Free heap: %d, HomeKit clients: %d",
 				ESP.getFreeHeap(), arduino_homekit_connected_clients_count());
@@ -97,7 +72,7 @@ void my_homekit_loop() {
 
 void set_on(const homekit_value_t v) {
     bool on = v.bool_value;
-    cha_on.value.bool_value = on; //sync the value
+    cha_on.value.bool_value = on;
 
     if(on) {
         is_on = true;
@@ -113,7 +88,7 @@ void set_on(const homekit_value_t v) {
 void set_hue(const homekit_value_t v) {
     Serial.println("set_hue");
     float hue = v.float_value;
-    cha_hue.value.float_value = hue; //sync the value
+    cha_hue.value.float_value = hue;
 
     current_hue = hue;
     received_hue = true;
@@ -124,7 +99,7 @@ void set_hue(const homekit_value_t v) {
 void set_sat(const homekit_value_t v) {
     Serial.println("set_sat");
     float sat = v.float_value;
-    cha_sat.value.float_value = sat; //sync the value
+    cha_sat.value.float_value = sat;
 
     current_sat = sat;
     received_sat = true;
@@ -136,8 +111,7 @@ void set_sat(const homekit_value_t v) {
 void set_bright(const homekit_value_t v) {
     Serial.println("set_bright");
     int bright = v.int_value;
-    cha_bright.value.int_value = bright; //sync the value
-
+    cha_bright.value.int_value = bright;
     current_brightness = bright;
 
     updateColor();
@@ -168,7 +142,7 @@ void updateColor()
       pixels.show();
 
     }
-  else if(!is_on) //lamp - switch to off
+  else if(!is_on)
   {
       Serial.println("is_on == false");
       pixels.setBrightness(0);
